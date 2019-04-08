@@ -6,7 +6,7 @@ class SimpleHealthCheck::JsonFile < SimpleHealthCheck::Base
     end
 
     if @json_info.is_a?(Hash)
-      @json_info.each do |k,v|
+      @json_info.each do |k, v|
         response.add name: k, status: v
       end
       response.status_code = :ok

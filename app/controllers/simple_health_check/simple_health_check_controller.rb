@@ -4,7 +4,12 @@ module SimpleHealthCheck
     layout nil
 
     def show
-      response = SimpleHealthCheck.run_checks
+      response = SimpleHealthCheck.run_simple_checks
+      render json: response.body, status: response.status
+    end
+
+    def show_detailed
+      response = SimpleHealthCheck.run_detailed_checks
       render json: response.body, status: response.status
     end
   end

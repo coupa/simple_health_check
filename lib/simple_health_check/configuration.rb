@@ -18,7 +18,7 @@ module SimpleHealthCheck
       attr_accessor :options
 
       def all_checks
-        @checks ||= [SimpleHealthCheck::BasicStatus]
+        @checks ||= []
         @memoized_all_checks ||= @checks.map do |c|
           c.is_a?(Class) ? c.new : c
         end

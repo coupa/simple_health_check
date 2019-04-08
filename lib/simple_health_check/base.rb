@@ -1,6 +1,9 @@
 module SimpleHealthCheck
   class Base
     attr_reader :service_name
+    attr_reader :response_time
+    attr_reader :type
+    attr_reader :version
     # derive a check class from this and add your checks.  the passed in response object
     # can set the key (name) and value (status) of the check to run.
     # All the combined checks are returned in a single hash.  Ensure you catch
