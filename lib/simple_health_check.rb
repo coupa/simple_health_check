@@ -53,18 +53,20 @@ module SimpleHealthCheck
 
     def run_detailed_checks
       response = SimpleHealthCheck::Response.new
-      response.add name: :dependencies, status: []
       SimpleHealthCheck::Configuration.all_checks.each_with_object(response) do |check, obj|
-        dependency_hash = {}
         begin
           status, error = check.call(response: obj)
           unless check.service_name.nil?
-            dependency_hash[:name] = check.service_name
-            dependency_hash[:type] = check.type
-            dependency_hash[:version] = check.version
-            dependency_hash[:responseTime] = check.response_time
-            dependency_hash[:state] = [status: status, error: error]
-            response.add name: :dependencies, status: dependency_hash
+            response.add name: :dependencies, status: [{
+              name: check.service_name,
+              type: check.type,
+              version: check.version,
+              responseTime: check.response_time,
+              state: [
+                status: status,
+                error: error
+              ]
+            }]
           end
         rescue # catch the error and try to log, but keep going finish all checks
           Rails.logger.error "simple_health_check gem ERROR: #{$ERROR_INFO}"
