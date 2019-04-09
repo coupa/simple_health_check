@@ -22,6 +22,10 @@ module SimpleHealthCheck
       @body[name] = status
     end
 
+    def append json
+      @body = @body.merge(json)
+    end
+
     def status_code
       @status || :ok
     end
@@ -48,11 +52,15 @@ module SimpleHealthCheck
           Rails.logger.error "simple_health_check gem ERROR: #{$ERROR_INFO}"
         end
       end
+      response.add name: 'status', status: response.status_code
       response
     end
 
     def run_detailed_checks
       response = SimpleHealthCheck::Response.new
+      unless SimpleHealthCheck::Configuration.detailed_description.nil?
+        response.append(SimpleHealthCheck::Configuration.detailed_description)
+      end
       SimpleHealthCheck::Configuration.all_checks.each_with_object(response) do |check, obj|
         begin
           status, error = check.call(response: obj)

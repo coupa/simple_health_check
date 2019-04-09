@@ -1,5 +1,5 @@
 class SimpleHealthCheck::MysqlCheck < SimpleHealthCheck::Base
-  def initialize service_name: "msyql", check_proc: nil, hard_fail: false
+  def initialize service_name: "mysql", check_proc: nil, hard_fail: false
     @service_name = service_name.to_s
     @proc = check_proc || SimpleHealthCheck::Configuration.mysql_check_proc
     @hard_fail = hard_fail
@@ -27,7 +27,7 @@ class SimpleHealthCheck::MysqlCheck < SimpleHealthCheck::Base
       status = connection ? :ok : :crit
       response.status_code = status
     rescue
-      # catch exceptions since we don't want the health-check to bubble all the way to the otp
+      # catch exceptions since we don't want the health-check to bubble all the way to the top
       status = :crit
       error = $ERROR_INFO.to_s
       response.status_code = :crit

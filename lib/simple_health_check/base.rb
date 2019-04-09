@@ -27,6 +27,7 @@ module SimpleHealthCheck
       @service_name = service_name
       @proc = check_proc
       @hard_fail = hard_fail
+      @response_time = nil
     end
 
     def should_hard_fail?
@@ -34,27 +35,26 @@ module SimpleHealthCheck
     end
 
     def call(response:)
+      status = nil
+      error = ''
       if @proc && @proc.respond_to?(:call)
         begin
           # @proc is a required user-supplied function to see if connection is working.
-          rv = @proc.call
-          response.add name: @service_name, status: rv
-          response.status_code = rv
+          start_time = Time.now
+          connection = @proc.call
+          @response_time = Time.now - start_time
+          status = connection ? :ok : :crit
+          response.status_code = status
         rescue
           # catch exceptions since we don't want the health-check to bubble all the way to the top
-          response.add name: "#{@service_name}_connection_error", status: $ERROR_INFO.to_s
-          response.status_code = :internal_server_error
-          response
+          status = :crit
+          error = $ERROR_INFO.to_s
+          response.status_code = :crit
         end
       else
-        unless @no_config_needed
-          response.add name: @service_name, status: 'missing_configuration'
-          response.status_code = :internal_server_error
-        end
+        response.status_code = :crit unless @no_config_needed
       end
-
-      response
+      [status, error]
     end
-
   end
 end

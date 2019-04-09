@@ -11,6 +11,7 @@ module SimpleHealthCheck
         s3_check_proc
         redis_check_proc
         version_file
+        detailed_description
       ].each do |opt|
         attr_accessor opt.to_sym
       end
@@ -40,6 +41,7 @@ module SimpleHealthCheck
 
     self.mount_at = 'health'
     self.version_file = 'VERSION'
+    self.detailed_description = nil
     self.options = {}
   end
 end
