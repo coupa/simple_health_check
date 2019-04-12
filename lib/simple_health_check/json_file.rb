@@ -9,7 +9,7 @@ class SimpleHealthCheck::JsonFile < SimpleHealthCheck::Base
       @json_info.each do |k, v|
         response.add name: k, status: v
       end
-      response.status_code = :ok
+      response.overall_status = :ok
     end
 
     response

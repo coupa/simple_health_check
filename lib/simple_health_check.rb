@@ -38,16 +38,16 @@ module SimpleHealthCheck
       @body = @body.merge(json)
     end
 
-    def status_code
+    def overall_status
       @status
     end
 
-    def status_code= val
+    def overall_status= val
       @status = val if val != :ok
     end
 
-    alias_method :status=, :status_code=
-    alias_method :status, :status_code
+    alias_method :status=, :overall_status=
+    alias_method :status, :overall_status
 
     def body
       @body
@@ -93,7 +93,7 @@ module SimpleHealthCheck
         end
       end
       response.add name: :dependencies, status: dependency_hash
-      response.add name: 'status', status: response.status_code
+      response.add name: 'status', status: response.overall_status
       response
     end
   end

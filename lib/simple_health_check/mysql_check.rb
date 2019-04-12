@@ -1,6 +1,6 @@
 class SimpleHealthCheck::MysqlCheck < SimpleHealthCheck::BaseNoProc
-  def initialize service_name: "mysql", check_proc: nil
-    @service_name = service_name.to_s
+  def initialize service_name: 'mysql', check_proc: nil
+    @service_name = service_name
     @proc = check_proc || SimpleHealthCheck::Configuration.mysql_check_proc
     @type = 'internal'
     @version = version_check || nil
@@ -8,7 +8,7 @@ class SimpleHealthCheck::MysqlCheck < SimpleHealthCheck::BaseNoProc
 
   def call(response:)
     begin
-      @version = @version.nil? ? version_check : @version
+      @version ||= version_check
     rescue
       @version = nil
     end

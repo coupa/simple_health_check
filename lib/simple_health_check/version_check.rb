@@ -7,10 +7,9 @@ class SimpleHealthCheck::VersionCheck < SimpleHealthCheck::Base
     @ver = nil
     if @ver.nil?
       if File.exist?(SimpleHealthCheck::Configuration.version_file)
-        @ver = File.read(SimpleHealthCheck::Configuration.version_file).strip rescue ''
+        @ver = File.read(SimpleHealthCheck::Configuration.version_file).strip rescue 'unknown'
       end
       response.add name: 'version', status: @ver
-      response.status_code = :ok
     end
     response
   end
