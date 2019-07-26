@@ -6,6 +6,7 @@ require 'simple_health_check/basic_status_check'
 module SimpleHealthCheck
   %w[
     generic_check
+    simple_generic_check
     http_endpoint_check
     json_file
     mysql_check
