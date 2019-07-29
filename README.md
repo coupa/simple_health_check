@@ -32,17 +32,8 @@ The class, or in some cases, an instance can also be passed in.
 
 ### Available checks:
 Simple checks:
-* `SimpleHealthCheck::BasicStatusCheck` - returns "status": 1
+* `SimpleHealthCheck::BasicStatus` - returns "status": "ok"
 * `SimpleHealthCheck::VersionCheck` - reads from "VERSION" file. Change filename with `SimpleHealthCheck::Configuration.version_file = Rails.root.join('VERSION')`
-* `SimpleHealthCheck::StatsDStatusCheck` - (requires `statsd-instrument` gem ONLY if this check is used) Calls statsd.gauge with a value 1.  Can be used in cases where the return value of the health check is not monitored.  The gauge name, additional tags, and minimum time in minutes allowed between
-statsd calls (calls to the health check within that interval will not update the gauge) are provided when the check is registered.  In the example the minimum time between setting the gauge is 1 minute,
-the gauge name 'service_health', and version '1.2' as a tag.  The check returns `'pushed statsd': true` if called outside of the set minimum interval, `'pushed statsd': false` if called before the interval has elapsed.
-```
-SimpleHealthCheck::Configuration.configure do |config|
-   config.add_check SimpleHealthCheck::StatsDStatusCheck.new(interval: 1, key_name: 'service_health', tags: ['version: 1.2'])
-end
-```
-
 
 * `SimpleHealthCheck::JsonFile` - much like the `VersionCheck`, however it reads a static json file and injects it into the returned status.
 
@@ -61,14 +52,21 @@ for an example where multiple fields and types can be set on failure.
 ```
   config.add_check SimpleHealthCheck::GenericCheck.new(service_name: 'TESTING', check_proc: -> { Time.now }, hard_fail: true )
 ```
+* `SimpleHealthCheck::SimpleGenericCheck`
+Same as the `SimpleHealthCheck::GenericCheck` but will also be executed by the `/health` action.
+It should only be used for light-weight checks that will return immediately.
 
 Derive new checks from `SimpleHealthCheck::Base` and write the `call` method.
 
 The `/health` action returns an http code (:ok, or other code as determined by a check result).  In a Rails app,
-the act of being able to render the action may be good enough to return `status: '1'`.
+the act of being able to render the action may be good enough to return `status: 'ok'.
 In some cases such as in ECS, you may want additional checks to not fail the entire action, as that would
 cause the container to get killed.  Whether or not you'd want this depends on your situation, and can be configured
 with the `hard_fail:` option.
+The `/health` action will only execute checks of type `SimpleHealthCheck::BasicStatus`, SimpleHealthCheck::JsonFile`,`SimpleHealthCheck::VersionCheck` and `SimpleHealthCheck::SimpleGenericCheck`.
+All registered checks will be executes by the `/health/detailed` action.
+                                                                
+                                                                
 
 ## Contributing
 

@@ -4,6 +4,7 @@ module SimpleHealthCheck
       # options for predefined checks:
       %w[
         generic_check
+        simple_generic_check
         http_endpoint_check_proc
         json_file
         mount_at
@@ -19,13 +20,14 @@ module SimpleHealthCheck
 
       attr_accessor :options
 
+      SIMPLE_CHECK_TYPES = [
+        SimpleHealthCheck::JsonFile,
+        SimpleHealthCheck::VersionCheck,
+        SimpleHealthCheck::SimpleGenericCheck
+      ].freeze
+
       def simple_checks
-        allowed_checks = [
-          SimpleHealthCheck::JsonFile,
-          SimpleHealthCheck::VersionCheck,
-          SimpleHealthCheck::StatsDStatusCheck
-        ]
-        added_checks = all_checks.map { |x| x if allowed_checks.include?(x.class) }
+        added_checks = all_checks.map { |x| x if SIMPLE_CHECK_TYPES.include?(x.class) }
         @simple_checks ||= added_checks.compact | [SimpleHealthCheck::BasicStatus.new]
       end
 
