@@ -10,6 +10,7 @@ module SimpleHealthCheck
     http_endpoint_check
     json_file
     mysql_check
+    redis_check
     resque_check
     scheduler_check
     s3_check
