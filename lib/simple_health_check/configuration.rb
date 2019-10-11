@@ -10,6 +10,7 @@ module SimpleHealthCheck
         mount_at
         mysql_check_proc
         redis_check_proc
+        memcache_check_proc
         s3_check_proc
         resque_check_proc
         scheduler_check_proc

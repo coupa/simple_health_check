@@ -10,6 +10,7 @@ class SimpleHealthCheck::HttpEndpointCheck < SimpleHealthCheck::BaseNoProc
   def call(response:)
     super do
       uri = URI(@url)
+      raise "Host is nil! Please pass a valid http endpoint." if uri.host.nil?
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true if @url.include?('https')
       request = Net::HTTP::Get.new(uri)
