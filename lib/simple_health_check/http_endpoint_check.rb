@@ -14,7 +14,19 @@ class SimpleHealthCheck::HttpEndpointCheck < SimpleHealthCheck::BaseNoProc
       http.use_ssl = true if @url.include?('https')
       request = Net::HTTP::Get.new(uri)
       resp = http.request(request)
-      (resp.read_body['status'] && :ok) || false
+      body = parse_response_body(resp)
+      @version = body['version']
+      (body['status'] && :ok) || false
     end
+  end
+
+  private
+
+  def parse_response_body(resp)
+    return {} if resp.nil?
+    JSON.parse(resp.read_body)
+  rescue
+    Rails.logger.error "[parse_response_body] error for #{service_name} - #{$ERROR_INFO}"
+    {}
   end
 end
