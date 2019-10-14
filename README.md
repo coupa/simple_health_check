@@ -56,6 +56,8 @@ for an example where multiple fields and types can be set on failure.
 Same as the `SimpleHealthCheck::GenericCheck` but will also be executed by the `/health` action.
 It should only be used for light-weight checks that will return immediately.
 
+* `SimpleHealthCheck::AsyncHttpEndpointCheck` - This does the health checks of http endpoints passed to it in an asynchronous way. Pass an array of endpoints that must be health checked.
+
 Derive new checks from `SimpleHealthCheck::Base` and write the `call` method.
 
 The `/health` action returns an http code (:ok, or other code as determined by a check result).  In a Rails app,
@@ -65,8 +67,7 @@ cause the container to get killed.  Whether or not you'd want this depends on yo
 with the `hard_fail:` option.
 The `/health` action will only execute checks of type `SimpleHealthCheck::BasicStatus`, SimpleHealthCheck::JsonFile`,`SimpleHealthCheck::VersionCheck` and `SimpleHealthCheck::SimpleGenericCheck`.
 All registered checks will be executes by the `/health/detailed` action.
-                                                                
-                                                                
+                                                                                                                             
 
 ## Contributing
 

@@ -7,6 +7,7 @@ module SimpleHealthCheck
   %w[
     generic_check
     simple_generic_check
+    async_http_endpoint_check
     http_endpoint_check
     json_file
     mysql_check
@@ -78,18 +79,17 @@ module SimpleHealthCheck
       dependency_hash = []
       SimpleHealthCheck::Configuration.all_checks.each_with_object(response) do |check, obj|
         begin
-          status, error = check.call(response: obj)
-          unless check.service_name.nil?
-            dependency_hash << {
-              name: check.service_name,
-              type: check.type,
-              version: check.version,
-              responseTime: check.response_time,
-              state: [
-                status: status,
-                error: error
-              ]
-            }
+          if check.is_a?(SimpleHealthCheck::AsyncHttpEndpointCheck)
+            # returns an array of HttpEndpointObj and responses
+            async_responses = check.call(response: obj)
+            async_responses.each do |response|
+              status, error = response[:response]
+              http_endpoint_obj = response[:http_endpoint_obj]
+              dependency_hash << structure_dependency_response(http_endpoint_obj, status, error) unless http_endpoint_obj.service_name.nil?
+            end
+          else
+            status, error = check.call(response: obj)
+            dependency_hash << structure_dependency_response(check, status, error) unless check.service_name.nil? 
           end
         rescue # catch the error and try to log, but keep going finish all checks
           Rails.logger.error "simple_health_check gem ERROR: #{$ERROR_INFO}"
@@ -98,6 +98,21 @@ module SimpleHealthCheck
       response.add name: :dependencies, status: dependency_hash
       response.add name: 'status', status: response.overall_status
       response
+    end
+
+    private
+
+    def structure_dependency_response(check, status, error)
+      {
+        name: check.service_name,
+        type: check.type,
+        version: check.version,
+        responseTime: check.response_time,
+        state: [
+          status: status,
+          error: error
+        ]
+      }
     end
   end
 end
