@@ -1,12 +1,14 @@
 # config is a hash that has the redis config details such as host, port and password
 class SimpleHealthCheck::RedisCheck < SimpleHealthCheck::BaseNoProc
+  DEFAULT_PORT = 6379
+  
   def initialize service_name: 'redis', check_proc: nil, config: {}
     @service_name = service_name
     @proc = check_proc || SimpleHealthCheck::Configuration.redis_check_proc
     @type = 'internal'
     config = config.symbolize_keys
     @host = config[:host]
-    @port = config[:port] || 6379
+    @port = config[:port] || DEFAULT_PORT
     @password = config[:password] || ''
   end
 

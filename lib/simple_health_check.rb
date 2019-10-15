@@ -11,6 +11,7 @@ module SimpleHealthCheck
     json_file
     mysql_check
     redis_check
+    memcache_check
     resque_check
     scheduler_check
     s3_check
