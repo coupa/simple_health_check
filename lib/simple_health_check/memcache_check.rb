@@ -17,7 +17,7 @@ class SimpleHealthCheck::MemcacheCheck < SimpleHealthCheck::BaseNoProc
       raise "Please pass the memcache config correctly" if @memcache_servers.empty? || @memcache_servers.any? {|server| server.split(':').length == 1}
 
       dalli_client = ::Dalli::Client.new(@memcache_servers)
-      @version = dalli_client.version&.values rescue nil
+      @version = dalli_client.version&.values.first rescue nil
       dalli_client.alive!
     end
   end
